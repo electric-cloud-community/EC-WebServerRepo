@@ -1,0 +1,15 @@
+<plugin>
+  <author>L. Rochette</author>
+  <authorUrl>mailto:lrochette@electric-cloud.com</authorUrl>
+  <category>Artifacts</category>
+  <commander-version min="8.0" />
+  <configure>ec_config</configure>
+  <depends min="1.4.1">EC-PluginManager</depends>
+  <description>Web Server based artifact repository integration</description>
+  <help>help.xml</help>
+  <key>EC-WebServerRepo</key>
+  <label>EC-WebServerRepo</label>
+  <pluginWizardBased>true</pluginWizardBased>
+  <depends min="1.4.1">EC-PluginManager</depends>
+  <version>1.0.0</version>
+</plugin>

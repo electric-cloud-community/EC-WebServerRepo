@@ -34,13 +34,6 @@ project pluginName, {
 		}
 	}
 
-	property 'ec_component_plugin', {
-		pluginType = 'Repository'
-		property 'operations', {
-			property 'Fetch content', value: 'RetrieveArtifactFromWebServer'
-		}
-	}
-
 }
 
 // Copy existing plugin configurations from the previous

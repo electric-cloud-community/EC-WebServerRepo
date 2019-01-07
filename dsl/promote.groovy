@@ -15,11 +15,8 @@ def pluginDir = getProperty("/projects/$pluginName/pluginDir").value
 //List of procedure steps to which the plugin configuration credentials need to be attached
 // ** steps with attached credentials
 def stepsWithAttachedCredentials = [
-		/*[
-			procedureName: 'Procedure Name',
-			stepName: 'step that needs the credentials to be attached'
-		 ],*/
-	]
+  [procedureName: 'RetrieveArtifactFromWebServer', stepName: 'retrieveArtifact'],
+]
 // ** end steps with attached credentials
 
 project pluginName, {
@@ -34,6 +31,13 @@ project pluginName, {
 				property 'label', value: 'Description'
 				property 'order', value: '1'
 			}
+		}
+	}
+
+	property 'ec_component_plugin', {
+		pluginType = 'Repository'
+		property 'operations', {
+			property 'Fetch content', value: 'RetrieveArtifactFromWebServer'
 		}
 	}
 

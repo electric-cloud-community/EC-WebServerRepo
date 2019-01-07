@@ -8,9 +8,8 @@ The ElectricFlow Web Server based artifact repository integration
 	git clone https://github.com/electric-cloud/ecpluginbuilder.git
     ```
 
-1. Run it'.
-
+1. Run it.
+This will build it, install it and promote it.
     ```
 	ec-perl ecpluginbuilder.pl
     ```
-    

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+    <key>@PLUGIN_KEY@</key>
+    <version>@PLUGIN_VERSION@</version>
+    <label>@PLUGIN_KEY@</label>
+    <description>WebServer-system-based repository for versioned artifacts in ElectricFlow</description>
+    <category>System</category>
+    <author>Electric Cloud</author>
+    <authorUrl>http://www.electric-cloud.com/support</authorUrl>
+    <help>@PLUGIN_KEY@_help.xml</help>
+    <commander-version min="6.5"/>
+
+    <customTypes>
+        <customType name="RetrieveArtifact">
+            <parameterPanel>
+                <javascript>war/ecplugins.EC_WebServerRepo.RetrieveArtifactParameterPanel/ecplugins.EC_WebServerRepo.RetrieveArtifactParameterPanel.nocache.js</javascript>
+                <help>/commander/pages/@PLUGIN_KEY@-@PLUGIN_VERSION@/help?s=Administration&amp;ss=Plugins#RetrieveArtifact
+                </help>
+            </parameterPanel>
+        </customType>
+    </customTypes>
+
+    <customTypes>
+        <customType name="PublishArtifact">
+            <parameterPanel>
+                <javascript>war/ecplugins.EC_WebServerRepo.PublishArtifactParameterPanel/ecplugins.EC_WebServerRepo.PublishArtifactParameterPanel.nocache.js</javascript>
+                <help>/commander/pages/@PLUGIN_KEY@-@PLUGIN_VERSION@/help?s=Administration&amp;ss=Plugins#RetrieveArtifact
+                </help>
+            </parameterPanel>
+        </customType>
+    </customTypes>
+</plugin>

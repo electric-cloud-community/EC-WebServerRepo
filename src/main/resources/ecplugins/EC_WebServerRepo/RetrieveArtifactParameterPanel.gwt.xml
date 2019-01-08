@@ -1,0 +1,10 @@
+<module>
+    <entry-point class="ecplugins.EC_WebServerRepo.client.RetrieveArtifactFactory"/>
+    <inherits name="com.google.gwt.resources.Resources"/>
+    <inherits name="com.google.gwt.i18n.I18N"/>
+    <inherits name="com.electriccloud.commander.gwt.ComponentBase"/>
+    <inherits name="ecinternal.ECInternal"/>
+
+    <!-- Reduce JAR size by restricting locales to build: remove this if the plugin is localized -->
+    <set-property name="locale" value="default"/>
+</module>

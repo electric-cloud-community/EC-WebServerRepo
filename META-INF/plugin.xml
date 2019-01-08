@@ -12,4 +12,13 @@
   <pluginWizardBased>true</pluginWizardBased>
   <depends min="1.4.1">EC-PluginManager</depends>
   <version>1.0.0</version>
+
+  <customTypes>
+      <customType name="RetrieveArtifact">
+          <parameterPanel>
+              <javascript>war/ecplugins.EC_WebServerRepo.RetrieveArtifactParameterPanel/ecplugins.EC_WebServerRepo.RetrieveArtifactParameterPanel.nocache.js</javascript>
+          </parameterPanel>
+      </customType>
+  </customTypes>
+
 </plugin>

@@ -1,0 +1,36 @@
+// -*- Groovy -*-
+// build.gradle
+//
+// Gradle build script for EC-WebServerRepo plugin.
+//
+// Copyright (c) 2019 Electric Cloud, Inc.
+// All rights reserved
+
+buildscript {
+    repositories {
+	maven {
+		url 'http://dl.bintray.com/ecpluginsdev/maven'
+	}
+
+	jcenter()
+    }
+    dependencies {
+        classpath group: 'com.electriccloud.plugins', name: 'flow-gradle-plugin', version: '+'
+    }
+}
+
+repositories {
+	maven {
+		url "https://oss.sonatype.org/content/repositories/snapshots"
+	}
+}
+
+group = "com.electriccloud"
+description = "Plugins : EC-WebServerRepo"
+version = "1.0.0"
+
+apply plugin: 'flow-gradle-plugin'
+
+task wrapper(type: Wrapper) {
+	gradleVersion = '2.13'
+}

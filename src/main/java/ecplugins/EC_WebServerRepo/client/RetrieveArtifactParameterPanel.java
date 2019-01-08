@@ -3,11 +3,11 @@
 //
 // RetrieveArtifactParameterPanel.java is part of ElectricCommander.
 //
-// Copyright (c) 2005-2014 Electric Cloud, Inc.
+// Copyright (c) 2005-2019 Electric Cloud, Inc.
 // All rights reserved.
 //
 
-package ecplugins.EC_Maven.client;
+package ecplugins.EC_WebServerRepo.client;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -40,24 +40,17 @@ public class RetrieveArtifactParameterPanel
     private static final String CONFIG  = "config";
     private static final String OVERWRITE  = "overwrite";
     private static final String DIRECTORY  = "directory";
-    private static final String TYPE       = "type";
-    private static final String CLASSIFIER = "classifier";
+    private static final String PATH       = "path";
     private static final String VERSION    = "version";
     private static final String ARTIFACT   = "artifact";
-    private static final String REPOSITORY = "repository";
-    private static final String SERVER     = "server";
     private static final String RESULT_PROPERTY = "resultProperty";
-    private static final String MISSING_SERVER_OR_CONFIG = "Either 'Server URL' or 'Configuration Name' must be specified.";
 
     //~ Instance fields --------------------------------------------------------
 
     private FormTable    m_form;
     private RadioText    m_Config;
-    private RadioText    m_Server;
-    private TextBox      m_Repository;
+    private RadioText    m_Path;
     private TextBox      m_Artifact;
-    private TextBox      m_Type;
-    private TextBox      m_Classifier;
     private VersionRange m_VersionRange;
     private CheckBox     m_Overwrite;
     private TextBox      m_Directory;
@@ -69,30 +62,21 @@ public class RetrieveArtifactParameterPanel
     {
         m_form         = getUIFactory().createFormTable();
         m_Config       = new RadioText("repository_config", true);
-        m_Server       = new RadioText("repository_config");
-        m_Repository   = new TextBox();
+        m_Path         = new TextBox();
         m_Artifact     = new TextBox();
-        m_Type         = new TextBox();
-        m_Classifier   = new TextBox();
         m_VersionRange = new VersionRange();
         m_Overwrite    = new CheckBox();
         m_Directory    = new TextBox();
         m_ResultProperty = new TextBox();
 
         m_form.addFormRow(CONFIG, "Configuration Name:", m_Config, false,
-                "Name of the configuration to be used for retrieving Maven Server's URL and credentials.<br/><br/>A Configuration defines connection details and can be created by going to plugin <a style=\"text-decoration: none !important; border-bottom-style: dashed; border-bottom-width: thin; font-size: inherit; color: inherit; font-family: inherit; border-color: #d8d8d8; border-spacing: 2px;\" target=\"_blank\" href=\"/commander/pages/EC-Maven/configurations\">configuration page</a>.");
-        m_form.addFormRow(SERVER, "Public Server URL:", m_Server, false,
-            "URL of public maven repository, for example, http://repo.spring.io/");
-        m_form.addFormRow(REPOSITORY, "Repository:", m_Repository, true,
-            "Name of maven repository, for example, 'repo'");
+            "Name of the configuration to be used for retrieving Web Server's URL and credentials.<br/><br/>A Configuration defines connection details and can be created by going to plugin <a style=\"text-decoration: none !important; border-bottom-style: dashed; border-bottom-width: thin; font-size: inherit; color: inherit; font-family: inherit; border-color: #d8d8d8; border-spacing: 2px;\" target=\"_blank\" href=\"/commander/pages/EC-Maven/configurations\">configuration page</a>.");
+        m_form.addFormRow(PATH, "Path:", m_Path, true,
+            "Path under the webServer root");
         m_form.addFormRow(ARTIFACT, "Artifact:", m_Artifact, true,
             "Id of artifact to be retrieved, in form of <artifact group>:<artifact key>, for example, 'org.apache.activemq:activemq-all'");
         m_form.addFormRow(VERSION, "Version:", m_VersionRange, false,
             "Artifact version");
-        m_form.addFormRow(CLASSIFIER, "Classifier:", m_Classifier, false,
-                "Artifact classifier");
-        m_form.addFormRow(TYPE, "Artifact Extension:", m_Type, true,
-            "Artifact type extension, for example, '.jar', '.txt'");
         m_form.addFormRow(DIRECTORY, "Retrieve to Directory:", m_Directory,
             false,
             "Directory to retrieve artifact to. Defaults to workspace directory");
@@ -111,25 +95,13 @@ public class RetrieveArtifactParameterPanel
     {
         m_form.clearAllErrors();
 
-        if (StringUtil.isEmpty(m_Repository.getValue())) {
-            m_form.setErrorMessage(REPOSITORY, MISSING_REQUIRED_ERROR_MESSAGE);
-
-            return false;
-        }
-        else if (StringUtil.isEmpty(m_Artifact.getValue())) {
+        if (StringUtil.isEmpty(m_Artifact.getValue())) {
             m_form.setErrorMessage(ARTIFACT, MISSING_REQUIRED_ERROR_MESSAGE);
 
             return false;
         }
-        else if (StringUtil.isEmpty(m_Type.getValue())) {
-            m_form.setErrorMessage(TYPE, MISSING_REQUIRED_ERROR_MESSAGE);
-
-            return false;
-        }
-
-        if(StringUtil.isEmpty(m_Server.getValue()) && StringUtil.isEmpty(m_Config.getValue())) {
-            m_form.setErrorMessage(SERVER, MISSING_SERVER_OR_CONFIG);
-            m_form.setErrorMessage(CONFIG, MISSING_SERVER_OR_CONFIG);
+        else if (StringUtil.isEmpty(m_VersionRange.getValue())) {
+            m_form.setErrorMessage(VERSION, MISSING_REQUIRED_ERROR_MESSAGE);
 
             return false;
         }
@@ -147,12 +119,9 @@ public class RetrieveArtifactParameterPanel
         Map<String, String> values = new HashMap<String, String>();
 
         values.put(CONFIG, m_Config.getValue());
-        values.put(SERVER, m_Server.getValue());
-        values.put(REPOSITORY, m_Repository.getValue());
+        values.put(PATH, m_Path.getValue());
         values.put(ARTIFACT, m_Artifact.getValue());
-        values.put(CLASSIFIER, m_Classifier.getValue());
         values.put(VERSION, m_VersionRange.getValue());
-        values.put(TYPE, m_Type.getValue());
         values.put(DIRECTORY, m_Directory.getValue());
         values.put(OVERWRITE, m_Overwrite.getValue()
                 ? "1"
@@ -164,7 +133,7 @@ public class RetrieveArtifactParameterPanel
 
     @Override public void setActualParameters(
             Collection<ActualParameter> actualParameters)
-    {
+    {ß
         m_VersionRange.setValue(null);
 
         for (ActualParameter actualParameter : actualParameters) {
@@ -174,23 +143,14 @@ public class RetrieveArtifactParameterPanel
             if (CONFIG.equals(name)) {
                 m_Config.setValue(value);
             }
-            else if (SERVER.equals(name)) {
-                m_Server.setValue(value);
-            }
-            else if (REPOSITORY.equals(name)) {
-                m_Repository.setValue(value);
+            else if (PATH.equals(name)) {
+                m_Path.setValue(value);
             }
             else if (ARTIFACT.equals(name)) {
                 m_Artifact.setValue(value);
             }
-            else if (CLASSIFIER.equals(name)) {
-                m_Classifier.setValue(value);
-            }
             else if (VERSION.equals(name)) {
                 m_VersionRange.setValue(value);
-            }
-            else if (TYPE.equals(name)) {
-                m_Type.setValue(value);
             }
             else if (DIRECTORY.equals(name)) {
                 m_Directory.setValue(value);

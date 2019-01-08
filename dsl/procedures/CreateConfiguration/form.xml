@@ -1,6 +1,6 @@
 <!--
 
-     Copyright 2016 Electric Cloud, Inc.
+     Copyright 2019 Electric Cloud, Inc.
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -31,11 +31,69 @@
         <documentation>Description for the plugin configuration.</documentation>
     </formElement>
     <formElement>
+        <type>entry</type>
+        <label>Web Server Instance:</label>
+        <property>instance</property>
+        <required>1</required>
+        <documentation>Web Server URL, e.g. http://server:80/folder.</documentation>
+    </formElement>
+    <formElement>
         <type>credential</type>
         <label>Credential:</label>
         <property>credential</property>
-        <required>1</required>
+        <required>0</required>
         <documentation>Credentials to connect</documentation>
         <attachedAsParameterToStep>createAndAttachCredential</attachedAsParameterToStep>
     </formElement>
-</editor>
+   <formElement>
+       <type>checkbox</type>
+       <property>checkConnection</property>
+       <label>Test Connection?:</label>
+       <required>0</required>
+       <checkedValue>1</checkedValue>
+       <uncheckedValue>0</uncheckedValue>
+       <value>1</value>
+       <htmlDocumentation>If checked, a test API call will be made before saving configuration. Configuration will not be saved if the call has failed.</htmlDocumentation>
+   </formElement>
+    <formElement>
+        <type>select</type>
+        <property>debugLevel</property>
+        <label>Debug Level:</label>
+        <required>0</required>
+        <value>0</value>
+        <option>
+            <name>Info</name>
+            <value>0</value>
+        </option>
+        <option>
+            <name>Debug</name>
+            <value>1</value>
+        </option>
+        <option>
+            <name>Trace</name>
+            <value>2</value>
+        </option>
+        <htmlDocumentation>
+            Debug level for logs. If set to Debug, some additional debug information will be show. If set to Trace, requests will also be shown.
+        </htmlDocumentation>
+    <formElement>
+        <type>entry</type>
+        <label>HTTP Proxy:</label>
+        <property>http_proxy</property>
+        <value></value>
+        <documentation>A proxy that should be used for connections.</documentation>
+        <required>0</required>
+    </formElement>
+    <formElement>
+        <type>credential</type>
+        <label>Proxy authorization:</label>
+        <property>proxy_credential</property>
+        <userNameLabel>Proxy username:</userNameLabel>
+        <passwordLabel>Proxy password:</passwordLabel>
+        <retypePasswordLabel>Retype Proxy password:</retypePasswordLabel>
+        <required>0</required>
+        <documentation>Username and password for proxy.</documentation>
+        <serverValidation>1</serverValidation>
+        <attachedAsParameterToStep>createAndAttachCredential</attachedAsParameterToStep>
+    </formElement>
+   </formElement></editor>

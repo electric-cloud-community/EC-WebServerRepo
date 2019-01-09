@@ -1,0 +1,7 @@
+<?xml version='1.0' standalone='yes'?>
+<fileset>
+  <file>
+    <path>ec_setup.pl</path>
+    <xpath>//property[propertyName=&quot;ec_setup&quot;]/value</xpath>
+  </file>
+</fileset>

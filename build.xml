@@ -1,0 +1,14 @@
+<project name="EC-WebServerRepo" default="package" basedir=".">
+	<description>
+        Build the EC-WebServerRepo plugin
+    </description>
+
+    <property name="buildconfigdir" value="../Plugin-In-A-Box/scripts" />
+
+	<!-- plugin specific properties -->
+	<property name="pluginKey" value="EC-WebServerRepo" />
+	<property name="pluginVersion" value="1.0.0" />
+	<property name="gwtModules" value=""/>
+
+    <import file="${buildconfigdir}/buildTargets.xml"/>
+</project>

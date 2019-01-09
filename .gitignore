@@ -1,3 +1,9 @@
 EC-WebServerRepo.jar
 hs_err*.log
 build/
+.idea
+*.iml
+build
+.DS_Store
+htdocs/war
+.gradle/

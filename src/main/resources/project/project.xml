@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<exportedData version="51" buildLabel="" buildVersion="4.0.0.0">
+    <exportPath>/projects/@PLUGIN_KEY@-@PLUGIN_VERSION@</exportPath>
+    <project>
+        <projectName>@PLUGIN_KEY@-@PLUGIN_VERSION@</projectName>
+        <propertySheet>
+            <property>
+                <propertyName>ec_setup</propertyName>
+                <description />
+                <expandable>0</expandable>
+                <value />
+            </property>
+        </propertySheet>
+    </project>
+</exportedData>

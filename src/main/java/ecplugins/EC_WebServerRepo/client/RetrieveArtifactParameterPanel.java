@@ -48,10 +48,10 @@ public class RetrieveArtifactParameterPanel
     //~ Instance fields --------------------------------------------------------
 
     private FormTable    m_form;
-    private RadioText    m_Config;
-    private RadioText    m_Path;
+    private TextBox      m_Config;
+    private TextBox      m_Path;
     private TextBox      m_Artifact;
-    private VersionRange m_VersionRange;
+    private TextBox      m_Version;
     private CheckBox     m_Overwrite;
     private TextBox      m_Directory;
     private TextBox      m_ResultProperty;
@@ -60,13 +60,13 @@ public class RetrieveArtifactParameterPanel
 
     @Override public Widget doInit()
     {
-        m_form         = getUIFactory().createFormTable();
-        m_Config       = new RadioText("repository_config", true);
-        m_Path         = new TextBox();
-        m_Artifact     = new TextBox();
-        m_VersionRange = new VersionRange();
-        m_Overwrite    = new CheckBox();
-        m_Directory    = new TextBox();
+        m_form          = getUIFactory().createFormTable();
+        m_Config        = new TextBox();
+        m_Path          = new TextBox();
+        m_Artifact      = new TextBox();
+        m_Version       = new TextBox();
+        m_Overwrite     = new CheckBox();
+        m_Directory     = new TextBox();
         m_ResultProperty = new TextBox();
 
         m_form.addFormRow(CONFIG, "Configuration Name:", m_Config, false,
@@ -75,7 +75,7 @@ public class RetrieveArtifactParameterPanel
             "Path under the webServer root");
         m_form.addFormRow(ARTIFACT, "Artifact:", m_Artifact, true,
             "Id of artifact to be retrieved, in form of <artifact group>:<artifact key>, for example, 'org.apache.activemq:activemq-all'");
-        m_form.addFormRow(VERSION, "Version:", m_VersionRange, false,
+        m_form.addFormRow(VERSION, "Version:", m_Version, false,
             "Artifact version");
         m_form.addFormRow(DIRECTORY, "Retrieve to Directory:", m_Directory,
             false,
@@ -100,7 +100,7 @@ public class RetrieveArtifactParameterPanel
 
             return false;
         }
-        else if (StringUtil.isEmpty(m_VersionRange.getValue())) {
+        else if (StringUtil.isEmpty(m_Version.getValue())) {
             m_form.setErrorMessage(VERSION, MISSING_REQUIRED_ERROR_MESSAGE);
 
             return false;
@@ -121,7 +121,7 @@ public class RetrieveArtifactParameterPanel
         values.put(CONFIG, m_Config.getValue());
         values.put(PATH, m_Path.getValue());
         values.put(ARTIFACT, m_Artifact.getValue());
-        values.put(VERSION, m_VersionRange.getValue());
+        values.put(VERSION, m_Version.getValue());
         values.put(DIRECTORY, m_Directory.getValue());
         values.put(OVERWRITE, m_Overwrite.getValue()
                 ? "1"
@@ -133,8 +133,8 @@ public class RetrieveArtifactParameterPanel
 
     @Override public void setActualParameters(
             Collection<ActualParameter> actualParameters)
-    {ß
-        m_VersionRange.setValue(null);
+    {
+        m_Version.setValue(null);
 
         for (ActualParameter actualParameter : actualParameters) {
             String name  = actualParameter.getName();
@@ -150,7 +150,7 @@ public class RetrieveArtifactParameterPanel
                 m_Artifact.setValue(value);
             }
             else if (VERSION.equals(name)) {
-                m_VersionRange.setValue(value);
+                m_Version.setValue(value);
             }
             else if (DIRECTORY.equals(name)) {
                 m_Directory.setValue(value);

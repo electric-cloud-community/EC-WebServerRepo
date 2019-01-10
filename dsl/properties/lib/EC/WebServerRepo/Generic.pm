@@ -29,16 +29,6 @@ sub plugin { shift->{plugin} }
 
 sub client { shift->{client} }
 
-sub get_artifact_path {
-    my ($self) = @_;
-
-    $self->plugin->validate_param_exists('path');
-    my $repo_path = $self->params->{path};
-    my $artifact = $self->params->{artifact};
-    my $version = $self->params->{version};
-    return "$repo_path/$artifact-$version.rpm";
-}
-
 sub layout_based_latest_version {
     my ($self) = @_;
 

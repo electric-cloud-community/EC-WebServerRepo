@@ -14,10 +14,6 @@ use File::Copy;
 use URI::Escape;
 use Encode qw(decode encode);
 
-use constant {
-    X_WebServerRepo_FILENAME => 'x-WebServerRepo-filename'
-};
-
 =head2 after_init_hook
 
 Debug level - we are reading property /projects/EC-PluginName-1.0.0/debugLevel.
@@ -151,8 +147,9 @@ sub step_retrieve_artifact {
 
     eval {
         my $destination = $params->{destination};
-        my $artifact_path = $artifact_handler->get_artifact_path;
-        $self->logger->info("Artifact path is $artifact_path");
+        my $artifact_path = $params->{path};
+        my $filename = $params->{artifact} . "-" . $params->{version} . ".rpm";
+        $self->logger->info("Artifact path is $artifact_path/$filename");
 
         if ($destination && !-e $destination) {
             my $ok = mkpath($destination, 1);
@@ -164,11 +161,10 @@ sub step_retrieve_artifact {
             }
         }
 
-        my $filepath = $self->download_artifact("$artifact_path", $destination);
+        my $filepath = $self->download_artifact($artifact_path, $filename, $destination);
         if ($params->{extract}) {
             $artifact_handler->extract($filepath, $params->{overwrite});
         }
-        $self->retrieve_properties($params->{repository}, $artifact_path);
         $self->save_result($self->retrieved_artifact);
         $self->set_properties_for_flow_ui($params, $self->retrieved_artifact->{url});
         1;
@@ -214,55 +210,6 @@ sub params {
     return $self->{params};
 }
 
-
-=head2 retrieve_properties
-
-Retrieves properties of the artifact.
-
-    $artifact_data->{url} - URL of the artifact to get properties from.
-
-=cut
-
-sub retrieve_properties {
-    my ($self, $repo, $artifact_path) = @_;
-
-    my $repo_path = "$repo/$artifact_path";
-    my $properties;
-    eval {
-        $properties = $self->client->properties($repo_path)->{properties};
-        1;
-    } or do {
-        if ($@ =~ /No properties could be found./) {
-            $self->logger->info('Artifact has no properties');
-            return;
-        }
-        else {
-            die $@;
-        }
-    };
-    $self->_write_properties($properties);
-    for my $property (keys %{$properties}) {
-        my $value = $properties->{$property};
-        $self->retrieved_artifact->{$property} = join(', ', @$value);
-    }
-}
-
-sub _write_properties {
-    my ($self, $props) = @_;
-
-    $self->logger->info("Artifact properties:");
-    for my $prop_name( sort keys %$props) {
-        if (ref $props->{$prop_name} eq 'ARRAY' && scalar @{$props->{$prop_name}} == 1) {
-            $self->logger->info(qq{"$prop_name": "$props->{$prop_name}->[0]"});
-        }
-        else {
-            $self->logger->info("$prop_name:");
-            for my $prop_value ( @{$props->{$prop_name}}) {
-                $self->logger->info(" - $prop_value");
-            }
-        }
-    }
-}
 
 =head2 client
 
@@ -326,10 +273,10 @@ sub published_artifact {
 }
 
 sub download_artifact {
-    my ($self, $repo_path, $destination) = @_;
+    my ($self, $repo_path, $artFilename, $destination) = @_;
 
     my $url = URI->new($self->config->{instance});
-    my $new_path = $url->path .  '/' . $repo_path;
+    my $new_path = $url->path .  "/$repo_path/$artFilename";
     $new_path =~ s{/+}{/}g;
     $url->path($new_path);
 
@@ -364,17 +311,15 @@ sub download_artifact {
     my $filepath;
     my $callback = sub {
         my ($chunk, $res) = @_;
-        print "Chunk" . Dumper($chunk);
-        print "Res: " . Dumper($res);
 
         eval {
             unless($fh && $filename) {
-                $filename = $res->header(X_WebServerRepo_FILENAME);
+                $filename = $artFilename;
                 # In case non-ascii symbols are met
                 $filename = uri_unescape($filename);
                 $filename = decode('utf8', $filename);
                 unless($filename) {
-                  $self->bail_out('Cannot download artifact (375): ' . $res->content);
+                  $self->bail_out('Cannot download artifact: ' . $res->content);
                 }
                 $filepath = $destination ? File::Spec->catfile($destination, $filename) : $filename;
                 if (!$self->params->{overwrite} && -e $filepath) {
@@ -404,7 +349,7 @@ sub download_artifact {
     $self->logger->trace($response->as_string);
     unless($response->is_success) {
         $self->logger->trace($response);
-        $self->bail_out("Cannot download artifact (405): " . $response->content);
+        $self->bail_out("Cannot download artifact: " . $response->content);
     }
 
     $self->log_summary(qq{Artifact "$filename" has been downloaded into } . ($destination ? $destination : 'current job workspace'));

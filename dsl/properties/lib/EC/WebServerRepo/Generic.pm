@@ -34,7 +34,7 @@ sub get_layout {
 
     my $layout = $self->params->{layout} || '';
     unless($layout) {
-        $layout = $self->get_default_layout($type);
+        $layout = $self->get_default_layout;
     }
     $self->logger->debug("Layout is $layout");
 
@@ -81,7 +81,7 @@ sub get_general_artifact_url {
     $repo_path =~ s/\/+/\//g;
     $repo_path =~ s/[()]//g;
 
-    my $filename=basename($repo_path)
+    my $filename=basename($repo_path);
 
     $uri->path($uri->path . '/' . $repo_path);
 

@@ -259,12 +259,15 @@ sub published_artifact {
 sub download_artifact {
     my ($self, $repo_path, $artFilename, $destination) = @_;
 
+
     my $url = URI->new($self->config->{instance});
-    my $new_path = $url->path .  "/$repo_path/$artFilename";
+    my $new_path = $url->path .  "/$repo_path";
     $new_path =~ s{/+}{/}g;
     $url->path($new_path);
 
     $self->logger->info("Artifact URL: $url");
+    $self->logger->info("download path: $repo_path");
+    $self->logger->info("download file: $artFilename");
 
     if ($self->{proxy}) {
         $self->{proxy}->apply();
@@ -303,7 +306,7 @@ sub download_artifact {
                 $filename = uri_unescape($filename);
                 $filename = decode('utf8', $filename);
                 unless($filename) {
-                  $self->bail_out('Cannot download artifact: ' . $res->content);
+                  $self->bail_out('Cannot download artifact (callback): ' . $res->content);
                 }
                 $filepath = $destination ? File::Spec->catfile($destination, $filename) : $filename;
                 if (!$self->params->{overwrite} && -e $filepath) {

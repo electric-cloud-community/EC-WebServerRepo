@@ -21,7 +21,7 @@
     <label>Configuration name</label>
     <property>config</property>
     <propertyReference>/plugins/@PLUGIN_NAME@/project/ec_plugin_cfgs</propertyReference>
-    <required>0</required>
+    <required>1</required>
     <type>entry</type>
   </formElement>
 
@@ -40,7 +40,7 @@
     <htmlDocumentation></htmlDocumentation>
     <label>Artifact version</label>
     <property>version</property>
-    <required>0</required>
+    <required>1</required>
     <type>entry</type>
     <value></value>
   </formElement>

@@ -29,84 +29,68 @@ sub plugin { shift->{plugin} }
 
 sub client { shift->{client} }
 
-sub layout_based_latest_version {
+sub get_layout {
     my ($self) = @_;
 
-    my $params = $self->params;
-    $self->plugin->validate_param_exists('artifact');
-    my $org = $params->{org};
-    my $org_path = $params->{orgPath};
-
-    unless($org || $org_path) {
-        $self->plugin->bail_out(qq{Either "org" or "orgPath" parameter should be specified for the latest version retrieval});
+    my $layout = $self->params->{layout} || '';
+    unless($layout) {
+        $layout = $self->get_default_layout($type);
     }
+    $self->logger->debug("Layout is $layout");
 
-    my $latest_version;
-    $org ||= $org_path;
-    eval {
-        $latest_version = $self->client->latest_version(
-            g => $org,
-            a => $params->{artifact},
-            repos => $params->{repository},
-            v => '*',
-        );
-        1;
-    } or do {
-        if ($@ =~ /Unable to find artifact versions/) {
-            $latest_version = $self->client->latest_version(
-                g => $org,
-                a => $params->{artifact},
-                repos => $params->{repository}
-            );
-        }
-        else {
-            $self->plugin->bail_out("Cannot find latest version: $@");
-        }
-    };
-
-    unless($latest_version) {
-        $self->plugin->bail_out("Cannot find latest version for $params->{artifact}, group $org, repos $params->{repository}");
-    }
-
-    $self->logger->info("Latest version for $org:$params->{artifact} is $latest_version");
-    return $latest_version;
+    return $layout;
 }
 
-
-sub calculate_checksum_sha1 {
-    my ($self, $filepath) = @_;
-
-    my $sha = Digest::SHA->new('SHA1');
-    $sha->addfile($filepath);
-    return $sha->hexdigest;
+sub get_default_layout {
+    return "[artifact]-[version].rpm";
 }
 
-sub calculate_checksum_sha256 {
-    my ($self, $filepath) = @_;
-
-    my $sha = Digest::SHA->new('SHA256');
-    $sha->addfile($filepath);
-    return $sha->hexdigest;
-}
-
-sub parse_properties {
+sub get_artifact_path {
     my ($self) = @_;
 
-    my $props = $self->params->{artifactProperties} || '';
-    my $retval = {};
-    eval {
-        $retval = decode_json($props);
-        1;
-    } or do {
-        my @lines = split(/\n+/, $props);
-        for my $line (@lines) {
-            my ($key, $value) = split(/\s*=\s*/, $line);
-            $retval->{$key} = uri_escape($value);
-        }
-    };
-    $retval->{'ElectricFlow.PublishedBy'} = uri_escape($self->plugin->get_return_link);
-    return $retval;
+    my $layout = $self->params->{layout} || $self->get_layout;
+    return $self->get_general_artifact_url($layout);
 }
+
+sub get_general_artifact_url {
+    my ($self, $layout, $params_redefined) = @_;
+
+    my $config = $self->config;
+    $params_redefined ||= {};
+    my $params = { %{$self->params}, %$params_redefined };
+
+    my $url = $layout;
+    my $replacer = sub {
+        my ($string, $token, $value) = @_;
+
+        $value ||= '';
+        $string =~ s/\[$token\]/$value/g;
+        return $string;
+    };
+
+    for my $part (qw/artifact version/) {
+        $url = $replacer->($url, $part, $params->{$part});
+    }
+    $url =~ s/\([.-]\)//g;
+
+    die 'No instance found in config' unless $config->{instance};
+
+    my $uri = URI->new($config->{instance});
+
+    my $repo_path = $url;
+    $repo_path =~ s/\/+/\//g;
+    $repo_path =~ s/[()]//g;
+
+    my $filename=basename($repo_path)
+
+    $uri->path($uri->path . '/' . $repo_path);
+
+    $self->logger->debug("Generated URL: $uri, $repo_path");
+    $self->logger->debug("Generated filename: $filename");
+
+    return ($repo_path, $filename);
+}
+
 
 sub extract {
     my ($self, $path, $overwrite) = @_;

@@ -26,16 +26,6 @@
   </formElement>
 
   <formElement>
-    <documentation></documentation>
-    <htmlDocumentation>Path under the root of the web server</htmlDocumentation>
-    <label>Path</label>
-    <property>path</property>
-    <required>0</required>
-    <type>entry</type>
-    <value></value>
-  </formElement>
-
-  <formElement>
     <documentation>Artifact name.</documentation>
     <htmlDocumentation></htmlDocumentation>
     <label>Artifact name</label>
@@ -54,6 +44,17 @@
     <type>entry</type>
     <value></value>
   </formElement>
+
+ <formElement>
+     <type>entry</type>
+     <label>Custom Layout</label>
+     <property>layout</property>
+     <required>0</required>
+     <value>RPMs/[artifact]-[version].rpm</value>
+     <htmlDocumentation>
+         Artifact layout,  E.g., dir1/dir2/[artifact]-[version].rpm.
+     </htmlDocumentation>
+ </formElement>
 
   <formElement>
     <documentation>Destination directory for artifact retrieval. Default is current job workspace.</documentation>

@@ -7,6 +7,8 @@ use File::Spec;
 use base qw(EC::Plugin::Core);
 use File::Path;
 use EC::WebServerRepo::Client;
+use EC::WebServerRepo::Generic;
+
 use EC::ProxyDispatcher;
 use Archive::Zip;
 use File::Basename;
@@ -81,7 +83,7 @@ sub step_retrieve_artifact {
         artifact
         version
         overwrite
-        path
+        layout
         resultPropertySheet
     /
     );
@@ -104,12 +106,9 @@ sub step_retrieve_artifact {
     for my $param (sort keys %$params) {
         $self->logger->info(qq{Got parameter "$param" with value "$params->{$param}"});
     }
-    # Release 1.0.0
-    $params->{useRepositoryLayout} = 0;
     $self->params($params);
 
-
-    for my $required (qw/artifact config/) {
+    for my $required (qw/artifact config version/) {
         $self->validate_param_exists($required);
     }
 
@@ -119,17 +118,8 @@ sub step_retrieve_artifact {
     $self->logger->trace($config);
 
     $self->retrieved_artifact->{version} = $params->{version};
-    my $class = 'EC::WebServerRepo::' . 'Generic'; # ucfirst(lc $params->{repoType});
-    $self->logger->debug("Class name $class");
 
-    eval "require $class";
-
-    if ($@) {
-        $self->logger->debug($@);
-        $self->bail_out("Cannot work with repository type $params->{repoType}");
-    }
-
-    my $artifact_handler = $class->new(
+    my $artifact_handler = EC::WebServerRepo::Generic->new(
         client => $self->client,
         plugin => $self,
         params => $params,
@@ -139,17 +129,11 @@ sub step_retrieve_artifact {
     );
 
     eval {
-        my $layout = 'generic'; #$artifact_handler->get_layout($self->params->{repoType});
-        if ($layout) {
-            $self->logger->info(qq{Repository layout is "$layout"});
-        }
-    };
-
-    eval {
         my $destination = $params->{destination};
-        my $artifact_path = $params->{path};
+        my ($artifact_path, $artifact_filename) = $artifact_handler->get_artifact_path;
         my $filename = $params->{artifact} . "-" . $params->{version} . ".rpm";
-        $self->logger->info("Artifact path is $artifact_path/$filename");
+        $self->logger->info("Artifact path is $artifact_path");
+        $self->logger->info("Artifact filename is $artifact_filename");
 
         if ($destination && !-e $destination) {
             my $ok = mkpath($destination, 1);
@@ -161,7 +145,7 @@ sub step_retrieve_artifact {
             }
         }
 
-        my $filepath = $self->download_artifact($artifact_path, $filename, $destination);
+        my $filepath = $self->download_artifact($artifact_path, $artifact_filename, $destination);
         if ($params->{extract}) {
             $artifact_handler->extract($filepath, $params->{overwrite});
         }

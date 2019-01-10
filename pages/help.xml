@@ -15,8 +15,166 @@
 <p>Plugin Version @PLUGIN_VERSION@</p>
 <hr style="margin-left: -10px; margin-top: 10px; height: 1px; width: 100%; color: #5981BD;" noshade="noshade" />
 
-<p>@PLUGIN_KEY@ is the integration of a Web Server to serve artifacts.</p>
+<p>Revised on January 10, 2019</p>
 
+<h1>Contents</h1>
+<ul>
+  <li><a href="#Overview">Overview</a></li>
+  <ul>
+    <li><a href="#CreateConfiguration">Create Plugin Configuration</a></li>
+    <li><a href="#EditPluginConfiguration">Update Plugin Configuration</a></li>
+  </ul>
+  <li><a href="#Procedures">Procedures</a></li>
+  <ul>
+      <li><a href="#RetrieveArtifactFromWebServer">RetrieveArtifactFromWebServer</a></li>
+  </ul>
+  <li><a href="#releaseNotes">Release Notes</a></li>
+  <ul>
+    <li><a href="#1.0.0">@PLUGIN_KEY@ 1.0.0 (beta)</a></li>
+  </ul>
+</ul>
+
+<h2 id="Overview">Overview</h2>
+<div>
+  <p>@PLUGIN_KEY@ is the integration of a Web Server to serve artifacts.</p>
+</div>
+
+<h2 id="Configuration">Configuration</h2>
+<div id="CreateConfiguration">
+  <a name="CreateConfiguration" id="CreateConfigurationLink"></a>
+  <h2>Plugin Configurations</h2>
+  <p>Plugin configurations are sets of parameters that apply across some or all
+    of the plugin procedures. They reduce repetition of common values, create
+    predefined parameter sets for end users, and securely store credentials where
+    needed. Each configuration is given a unique name that is entered in designated
+    parameters on procedures that use them.<br />
+  </p>
+  <h3>Creating Plugin Configurations</h3>
+  <p>To create plugin configurations in ElectricFlow,
+  do these steps:</p>
+  <ol>
+    <li>Go to <b>Administration</b> &gt; <b>Plugins</b> to open the Plugin Manager.</li>
+    <li>Find the @PLUGIN_KEY@ row.</li>
+    <li>Click <b>Configure</b> to open the @PLUGIN_KEY@ Configurations page.</li>
+    <li>Click <b>Create Configuration</b>.</li>
+    <li>To enable ElectricFlow server to communicate with the API,
+    enter the following information:<br /></li>
+
+    <table class="grid">
+      <thead><tr><th>Parameter</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="required">Configuration:</td>
+          <td>Unique name for the plugin configuration.</td>
+        </tr>
+        <tr>
+          <td>Description:</td>
+          <td>Description for the plugin configuration.</td>
+        </tr>
+        <tr>
+          <td class="required">Web Server Instance:</td>
+          <td>Web server URL, e.g. https://server.domain.com/folder.</td>
+        </tr>
+        <tr>
+          <td>Credential</td>
+          <td>Username and password to connect to Web Server.</td>
+        </tr>
+        <tr>
+          <td>Test Connection</td>
+        <td>If checked, a test request will be sent to the web server to ensure
+          that credentials and endpoints are set correctly and the instance is
+          available.</td>
+        </tr>
+        <tr>
+          <td>Debug Level</td>
+          <td>Debug level for logs. If set to Debug, some additional debug
+            information will be show. If set to Trace, requests will also be shown.</td>
+        </tr>
+        <tr>
+          <td>HTTP Proxy</td>
+          <td>A HTTP proxy that could be used for connections.</td>
+        </tr>
+        <tr>
+          <td>Proxy Authorization</td>
+          <td>Username and password used to connect to HTTP proxy.</td>
+        </tr>
+     </tbody>
+  </table>
+  <img src="../../plugins/@PLUGIN_KEY@/images/CreateConfiguration.png" />
+</ol>
+<p>The @PLUGIN_KEY@ Configurations page now shows the new configuration.</p>
+
+<h3 id="EditPluginConfiguration">Editing Plugin Configurations</h3>
+<p>To edit plugin configurations in ElectricFlow,
+do these steps:</p>
+<ol>
+   <li>Go to <b>Administration</b> &gt; <b>Plugins</b> to open the Plugin Manager.</li>
+   <li>Find the @PLUGIN_KEY@ row.</li>
+   <li>Click <b>Configure</b> to open the Configurations page.</li>
+   <li>Find the configuration that you want to edit.</li>
+   <li>Click <b>Edit</b>.</li>
+   <li>Edit the parameters in the configuration.</li>
+   <li>Click <b>OK</b> to save the modified configuration.</li>
+</ol>
+</div>
+
+<h1 id="Procedures">Procedures</h1>
+<div id="RetrieveArtifactFromWebServer">
+   <a name="RetrieveArtifactFromWebServer" id="RetrieveArtifactFromWebServer" />
+
+<h3>RetrieveArtifactFromWebServer</h3>
+<p>
+   Retrieves the exact version of the artifact from the Web Server.
+</p>
+
+<table class="grid">
+  <thead><tr><th>Parameter</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr>
+      <td class="required">Configuration</td>
+      <td>Previously defined configuration name, e.g. "config".</td>
+    </tr>
+    <tr>
+      <td class="required">Artifact</td>
+      <td>Artifact name</td>
+    </tr>
+    <tr>
+      <td class="required">Version</td>
+      <td>Exact version to be downloaded</td>
+    </tr>
+    <tr>
+      <td>Retrieve to Directory</td>
+      <td>Download the artifact version to a specific directory. If not defined,
+        the artifact will be downloaded into the current directory. If the
+        specified directory does not exist, it will be created. This path may be
+        absolute or relative, e.g. /tmp/my_artifact or artifact_name.</td>
+    </tr>
+    <tr>
+      <td>layout</td>
+      <td>Repository layout e.g. dir1/dir2/[artifact]-[version].rpm</td>
+    </tr>
+    <tr>
+      <td>Overwrite</td>
+      <td>If checked, the existing package will be overwritten.</td>
+    </tr>
+    <tr>
+      <td>Retrieved Artifact Location Property</td>
+      <td>Name or property sheet path used by the step to create a property sheet.
+        This property sheet stores information about the retrieved artifact
+        version, including its location in the file system. Properties are saved
+        under &lt;retrievedArtifactLocationProperty&gt;/&lt;artifactName&gt;</td>
+    </tr>
+   </tbody>
+</table>
+<img src="../../plugins/@PLUGIN_KEY@/images/RetrieveArtifact.png" />
+</div>
+
+<!-- PROCEDURES END -->
+<h1 id="releaseNotes">Release Notes</h1>
+<h3 id="1.0.0">@PLUGIN_KEY@ 1.0.0 (beta)</h3>
+<ul>
+    <li>Early version support RetrieveArtifact and layout.</li>
+</ul>
 
 </div>
 </body>

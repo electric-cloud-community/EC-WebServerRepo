@@ -364,6 +364,8 @@ sub download_artifact {
     my $filepath;
     my $callback = sub {
         my ($chunk, $res) = @_;
+        print "Chunk" . Dumper($chunk);
+        print "Res: " . Dumper($res);
 
         eval {
             unless($fh && $filename) {
@@ -372,8 +374,7 @@ sub download_artifact {
                 $filename = uri_unescape($filename);
                 $filename = decode('utf8', $filename);
                 unless($filename) {
-                  print Dumper($res);
-                    $self->bail_out('Cannot download artifact (375): ' . $res->content);
+                  $self->bail_out('Cannot download artifact (375): ' . $res->content);
                 }
                 $filepath = $destination ? File::Spec->catfile($destination, $filename) : $filename;
                 if (!$self->params->{overwrite} && -e $filepath) {

@@ -24,7 +24,7 @@ BEGIN {
         # Undo perl'd require transformation
         my $prop = $target;
         $prop =~ s#\.pm$##;
-        my $display = '[EC]@PLUGIN_KEY@-@PLUGIN_VERSION@/'.$prop;
+        my $display = '@PLUGIN_KEY@-@PLUGIN_VERSION@/'.$prop;
         $prop = "$prefix$prop";
         my $code = eval {
             $ec->getProperty("$prop")->findvalue('//value')->string_value;

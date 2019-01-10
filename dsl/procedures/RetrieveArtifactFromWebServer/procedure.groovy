@@ -4,6 +4,8 @@ def stepName = 'retrieveArtifact'
 procedure procName,
   description: 'Retrieve an artifact from a web server',
 {
+  //property 'customType', value: '@PLUGIN_KEY@-@PLUGIN_VERSION@/RetrieveArtifact'
+
   property 'ec_customEditorData', {
     property 'nameIdentifier', value: 'artifact'
     property 'versionIdentifier', value: 'version'

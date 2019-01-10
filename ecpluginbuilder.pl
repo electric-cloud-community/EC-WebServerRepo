@@ -46,10 +46,11 @@ my $pluginName = "${pluginKey}-${pluginVersion}";
 
 
 print "[INFO] - Creating plugin '$pluginName'\n";
-print "[INFO] - gradle\n";
-system("./gradlew compileGwt");
-system("rm -rf htdocs/war;mkdir htdocs/war");
-system("cp -fr build/gwt/out/ecplugins.EC_WebServerRepo.RetrieveArtifactParameterPanel/ htdocs/war/ecplugins.EC_WebServerRepo.RetrieveArtifactParameterPanel/");
+
+# print "[INFO] - gradle\n";
+# system("./gradlew compileGwt");
+# system("rm -rf htdocs/war;mkdir htdocs/war");
+# system("cp -fr build/gwt/out/ecplugins.EC_WebServerRepo.RetrieveArtifactParameterPanel/ htdocs/war/ecplugins.EC_WebServerRepo.RetrieveArtifactParameterPanel/");
 
 print "[INFO] - ecpluginbuilder\n";
 system ("$epb -pack-jar -plugin-name $pluginKey -plugin-version $pluginVersion " .

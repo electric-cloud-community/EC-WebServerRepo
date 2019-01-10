@@ -81,23 +81,12 @@ sub step_retrieve_artifact {
 
     my $params = $self->get_params_as_hashref(qw/
         config
-        repository
         destination
         artifact
         version
         overwrite
-        orgPath
-        fileItegRev
-        folderItegRev
-        extension
-        classifier
-        repoType
-        latestVersion
-        org
-        type
-        extract
-        useRepositoryLayout
-        repositoryPath
+        path
+        resultPropertySheet
     /
     );
 
@@ -120,15 +109,12 @@ sub step_retrieve_artifact {
         $self->logger->info(qq{Got parameter "$param" with value "$params->{$param}"});
     }
     # Release 1.0.0
-    $params->{useRepositoryLayout} = 1;
+    $params->{useRepositoryLayout} = 0;
     $self->params($params);
 
 
-    for my $required (qw/repository artifact config repoType/) {
+    for my $required (qw/artifact config/) {
         $self->validate_param_exists($required);
-    }
-    unless($self->check_repo_exists($params->{repository})) {
-        $self->bail_out("Repository $params->{repository} does not exist or the user does not have rights to read it");
     }
 
     my $config = $self->get_config_values($self->{plugin_name}, $params->{config});
@@ -137,7 +123,7 @@ sub step_retrieve_artifact {
     $self->logger->trace($config);
 
     $self->retrieved_artifact->{version} = $params->{version};
-    my $class = 'EC::WebServerRepo::' . ucfirst(lc $params->{repoType});
+    my $class = 'EC::WebServerRepo::' . 'Generic'; # ucfirst(lc $params->{repoType});
     $self->logger->debug("Class name $class");
 
     eval "require $class";
@@ -157,7 +143,7 @@ sub step_retrieve_artifact {
     );
 
     eval {
-        my $layout = $artifact_handler->get_layout($self->params->{repoType});
+        my $layout = 'generic'; #$artifact_handler->get_layout($self->params->{repoType});
         if ($layout) {
             $self->logger->info(qq{Repository layout is "$layout"});
         }
@@ -178,7 +164,7 @@ sub step_retrieve_artifact {
             }
         }
 
-        my $filepath = $self->download_artifact($artifact_path, $destination);
+        my $filepath = $self->download_artifact("$artifact_path", $destination);
         if ($params->{extract}) {
             $artifact_handler->extract($filepath, $params->{overwrite});
         }
@@ -192,159 +178,6 @@ sub step_retrieve_artifact {
 }
 
 
-sub step_publish_artifact {
-    my ($self) = @_;
-
-    my $params = $self->get_params_as_hashref(qw/
-        config
-        repository
-        artifact
-        version
-        orgPath
-        fileItegRev
-        folderItegRev
-        extension
-        classifier
-        repoType
-        repositoryLayout
-        org
-        type
-        repositoryPath
-        useRepositoryLayout
-        artifactPath
-        artifactProperties
-        resultPropertySheet
-    /);
-
-
-    unless(-f $params->{artifactPath}) {
-        $self->bail_out(qq{Artifact file "$params->{artifactPath} does not exist"});
-    }
-    for my $param (sort keys %$params) {
-        $self->logger->info(qq{Got parameter "$param" with value "$params->{$param}"});
-    }
-    $self->params($params);
-    $params->{useRepositoryLayout} = 1;
-
-    for my $required (qw/repository config repoType/) {
-        $self->validate_param_exists($required);
-    }
-
-    unless($self->check_repo_exists($params->{repository})) {
-        $self->bail_out("Repository $params->{repository} does not exist");
-    }
-
-    my $repo_type = $params->{repoType};
-    my $class = 'EC::WebServerRepo::' . ucfirst( lc $repo_type);
-    eval "require $class";
-
-    if ($@) {
-        $self->logger->debug($@);
-        $self->bail_out("Cannot work with repository type $params->{repoType}");
-    }
-
-    my $artifact_handler = $class->new(
-        client => $self->client,
-        plugin => $self,
-        params => $params,
-        config => $self->config,
-        logger => $self->logger,
-    );
-
-    $artifact_handler->publish;
-
-    my $path = $self->published_artifact->{path};
-    $path =~ s/;.+$//g;
-    my $uri = $self->get_instance_uri;
-    $uri->path($uri->path . '/' . $path);
-
-    my $webapp_uri = $self->get_webapp_uri;
-    # http://WebServerRepo:80/path/Newtonsoft.Json.10.0.1.nupkg
-    $webapp_uri->path($webapp_uri->path . "/$path");
-    $webapp_uri =~ s/%23/#/;
-
-    $self->published_artifact->{url} = "$uri";
-    $self->published_artifact->{webapp_url} = "$webapp_uri";
-    $self->save_result($self->published_artifact);
-
-    $self->log_summary(qq{Artifact "$params->{artifact}" has been published to $webapp_uri, download link $uri});
-    $self->show_link("Published artifact $params->{artifact}.$params->{version}", $webapp_uri);
-}
-
-=head2 step_retrieve_artifact
-
-Get latest artifact version. Same retrieve without actually retrieve
-
-=cut
-sub step_get_latest_artifact_version {
-    my ($self) = @_;
-
-    my $params = $self->get_params_as_hashref(qw/
-        config
-        repoType
-        repository
-        orgPath
-        artifact
-        classifier
-    /
-    );
-
-    my $result_property = '';
-    eval {
-        $result_property = $self->ec->getProperty({
-            propertyName => 'resultProperty',
-            expand => 0,
-        })->findvalue('//value')->string_value;
-    };
-    if ($result_property) {
-        $result_property = $self->ec->expandString({value => $result_property})->findvalue('//value')->string_value;
-    }
-    $result_property ||= '/myJob/retrievedArtifactVersions/$[assignedResourceName]';
-    $result_property = $self->ec->expandString({value => $result_property})->findvalue('//value')->string_value;
-
-    $params->{resultPropertySheet} = $result_property;
-
-    for my $param (sort keys %$params) {
-        $self->logger->info(qq{Got parameter "$param" with value "$params->{$param}"});
-    }
-    # Release 1.0.0
-    $params->{useRepositoryLayout} = 1;
-    $self->params($params);
-
-
-    for my $required (qw/artifact config repoType orgPath repository/) {
-        $self->validate_param_exists($required);
-    }
-    unless($self->check_repo_exists($params->{repository})) {
-        $self->bail_out("Repository $params->{repository} does not exist or the user does not have rights to read it");
-    }
-
-    my $config = $self->get_config_values($self->{plugin_name}, $params->{config});
-
-    $self->logger->trace('Parameters', $params);
-    $self->logger->trace($config);
-
-    my $latest_version;
-    eval {
-        my $versions = $self->client->get_artifact_versions($params);
-
-        # Versions should come sorted
-        $latest_version = $versions->[$#{$versions}];
-        1;
-    } or do {
-        $self->bail_out("Cannot retrieve versions for artifact : $@\n");
-    };
-
-    if (!$latest_version){
-        $self->bail_out("Failed to retrieve latest version. Check that artifact exists and parameters are correct");
-    }
-
-    $self->logger->info("Version saved to $result_property. Value is '$latest_version'");
-    $self->ec->setProperty($result_property, $latest_version);
-
-    $self->success("Successfully retrieved latest version");
-    exit 0;
-}
 
 =head2 save_result
 
@@ -456,16 +289,6 @@ sub client {
     return $self->{client};
 }
 
-sub retrieve_generic_data {
-    my ($self) = @_;
-
-    my $layout = $self->params->{repositoryLayout} || $self->get_layout('generic');
-    unless($layout) {
-        $self->bail_out('No layout was defined for the generic repository');
-    }
-    my $data = $self->get_general_artifact_url($layout);
-    return {url => $data->{url}};
-}
 
 
 
@@ -506,7 +329,7 @@ sub download_artifact {
     my ($self, $repo_path, $destination) = @_;
 
     my $url = URI->new($self->config->{instance});
-    my $new_path = $url->path . '/' . $self->params->{repository} . '/' . $repo_path;
+    my $new_path = $url->path .  '/' . $repo_path;
     $new_path =~ s{/+}{/}g;
     $url->path($new_path);
 
@@ -549,7 +372,8 @@ sub download_artifact {
                 $filename = uri_unescape($filename);
                 $filename = decode('utf8', $filename);
                 unless($filename) {
-                    $self->bail_out('Cannot download artifact: ' . $res->content);
+                  print Dumper($res);
+                    $self->bail_out('Cannot download artifact (375): ' . $res->content);
                 }
                 $filepath = $destination ? File::Spec->catfile($destination, $filename) : $filename;
                 if (!$self->params->{overwrite} && -e $filepath) {
@@ -579,7 +403,7 @@ sub download_artifact {
     $self->logger->trace($response->as_string);
     unless($response->is_success) {
         $self->logger->trace($response);
-        $self->bail_out("Cannot download artifact: " . $response->content);
+        $self->bail_out("Cannot download artifact (405): " . $response->content);
     }
 
     $self->log_summary(qq{Artifact "$filename" has been downloaded into } . ($destination ? $destination : 'current job workspace'));

@@ -76,7 +76,8 @@
         <htmlDocumentation>
             Debug level for logs. If set to Debug, some additional debug information will be show. If set to Trace, requests will also be shown.
         </htmlDocumentation>
-    <formElement>
+    </formElement>
+   <formElement>
         <type>entry</type>
         <label>HTTP Proxy:</label>
         <property>http_proxy</property>
@@ -96,4 +97,4 @@
         <serverValidation>1</serverValidation>
         <attachedAsParameterToStep>createAndAttachCredential</attachedAsParameterToStep>
     </formElement>
-   </formElement></editor>
+</editor>

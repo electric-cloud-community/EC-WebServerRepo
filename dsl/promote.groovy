@@ -34,6 +34,15 @@ project pluginName, {
 		}
 	}
 
+	property 'ec_component_plugin', {
+		pluginType = 'Repository'
+		property 'operations', {
+			property 'Fetch content',
+        value: 'RetrieveArtifactFromWebServer',
+        description: 'This operation retrieves the content from the repository'
+			// property 'Fetch latest version', value: 'Get Latest Artifact Version'
+		}
+	}
 }
 
 // Copy existing plugin configurations from the previous

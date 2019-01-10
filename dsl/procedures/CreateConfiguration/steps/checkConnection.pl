@@ -87,10 +87,7 @@ if ($proxy) {
 }
 
 my $uri = URI->new($url);
-$uri->path_segments($uri->path_segments, 'api', 'repositories');
-
 print "$uri\n";
-
 
 my $request = HTTP::Request->new(GET => $uri);
 

@@ -1,0 +1,24 @@
+@external gwt-TextBox;
+
+textarea.wideTextArea {
+    width: 400px;
+}
+.gwt-TextBox {
+    width: 250px;
+}
+
+.gwt-TextBox:disabled {
+    color: #888;
+}
+
+table.artifactVersionForm input.shortInput {
+    width: 150px;
+}
+
+table.artifactVersionForm input.mediumInput {
+    width: 250px;
+}
+
+table.artifactVersionForm input.longInput {
+    width: 450px;
+}

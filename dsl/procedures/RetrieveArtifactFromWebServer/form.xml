@@ -14,7 +14,8 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 
---><editor>
+-->
+<editor>
   <formElement>
     <documentation>Previously defined plugin configuration.</documentation>
     <label>Configuration name</label>
@@ -70,8 +71,11 @@
     <label>Overwrite?</label>
     <property>overwrite</property>
     <required>0</required>
-    <type>entry</type>
-    <value></value>
+      <type>checkbox</type>
+      <checkedValue>1</checkedValue>
+      <uncheckedValue>0</uncheckedValue>
+      <initiallyChecked>1</initiallyChecked>
+      <value>0</value>
   </formElement>
 
   <formElement>
@@ -81,7 +85,7 @@
     <property>resultPropertySheet</property>
     <required>0</required>
     <type>entry</type>
-    <value></value>
+    <value>/myJob/retrievedArtifactVersions/$[assignedResourceName]</value>
     <expansionDeferred>true</expansionDeferred>
   </formElement>
 
